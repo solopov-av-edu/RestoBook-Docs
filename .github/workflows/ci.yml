@@ -21,12 +21,10 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      # - run: pip install lightgallery
       - run: pip install mkdocs-glightbox
       - run: pip install mkdocs-swagger-ui-tag
       - run: pip3 install mkdocs-build-plantuml-plugin
       - run: pip3 install mkdocs-enumerate-headings-plugin
-      # - run: pip3 install mkdocs-print-site-plugin
       - run: pip install mkdocs-material 
       - run: mkdocs gh-deploy --force
       
