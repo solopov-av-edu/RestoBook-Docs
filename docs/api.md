@@ -2,4 +2,4 @@
 
 <swagger-ui src= "/assets/solopov-av-edu-Booking_System-1.3-resolved.yaml" />
 
-<swagger-ui src= "/assets/solopov-av-edu-RestoBookAPI-1.0.0-swagger.yaml" />
+<swagger-ui src="https://petstore.swagger.io/v2/swagger.json"/>
