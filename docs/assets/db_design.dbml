@@ -1,0 +1,156 @@
+// Use DBML to define your database structure
+// Docs: https://www.dbml.org/docs
+// https://dbdiagram.io/d
+
+Table business_type {
+  id integer [primary key]
+  name varchar
+}
+
+Table client_status {
+  id integer [primary key]
+  name varchar
+}
+
+Table user_status {
+  id integer [primary key]
+  name varchar
+}
+
+Table restaurant_status {
+  id integer [primary key]
+  name varchar
+}
+
+Table cuisine_types {
+  id integer [primary key]
+  name varchar
+}
+
+Table table_status {
+  id integer [primary key]
+  name varchar
+}
+
+Table booking_status {
+  id integer [primary key]
+  name varchar
+}
+
+Table client {
+  id integer [primary key]
+  name varchar
+  status_id integer
+  business_type_id integer
+  tariff_id integer
+  client_representetive_id integer
+}
+
+Table tariff {
+  id integer [primary key]
+  name varchar
+  is_individual boolean
+  comission integer
+  discount integer
+}
+
+Table client_data {
+  id integer [primary key]
+  client_id integer
+  inn integer
+  kpp integer
+  ogrn integer
+  ogrn_date date
+  reg_date date
+  address varchar
+  director_name varchar
+  capital decimal
+}
+
+Table restaurant {
+  id integer [primary key]
+  client_id integer
+  name varchar
+  status_id integer
+  cuisine_types_id varchar
+  address varchar
+  phone_number varchar
+  description text
+}
+
+Table cuisine_types_restaurant {
+  id integer [primary key]
+  rest_id integer
+  ct_id integer
+}
+
+Table schedule {
+  id integer [primary key]
+  rest_id integer
+  day_of_week varchar
+  min_worktime time
+  max_worktime time
+  special_day_min date
+  special_day_max date
+  is_not_working boolean
+}
+
+Table table {
+  id integer [primary key]
+  rest_id integer
+  table_status_id integer
+  booking_id integer
+  name varchar
+  seats_limit integer
+  annotation varchar
+}
+
+Table user {
+  id integer [primary key]
+  name varchar
+  login varchar
+  password_hash varchar
+  status_id varchar
+  phone_number varchar
+}
+
+Table booking {
+  id integer [primary key]
+  booking_status_id integer
+  user_id integer
+  date_in datetime
+  date_out datetime
+  count_persons integer
+  annotation text
+}
+
+Table client_representetive {
+  id integer [primary key]
+  client_id integer
+  login varchar
+  password_hash varchar
+  first_name varchar
+  second_name varchar
+  phone_number varchar
+}
+
+Ref: client.business_type_id > business_type.id
+Ref: client.status_id > client_status.id
+Ref: client.id < client_representetive.client_id
+Ref: client.tariff_id > tariff.id
+Ref: client.id - client_data.client_id
+Ref: client.id < restaurant.client_id
+
+Ref: restaurant.status_id > restaurant_status.id
+Ref: restaurant.id < cuisine_types_restaurant.rest_id
+Ref: restaurant.id < schedule.rest_id
+Ref: restaurant.id < table.rest_id
+Ref: cuisine_types_restaurant.ct_id < cuisine_types.id
+
+Ref: user.status_id > user_status.id
+Ref: user.id < booking.user_id
+
+Ref: booking.booking_status_id > booking_status.id
+Ref: booking.id < table.booking_id
+
+Ref: table.table_status_id > table_status.id

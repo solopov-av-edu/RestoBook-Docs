@@ -1,0 +1,81 @@
+@startuml Architecture
+
+!include <C4/C4_Container>
+skinparam Linetype polyline
+skinparam wrapWidth 900
+
+Person(manager, "Менеджер")
+Person(client, "Представитель клиента")
+Person(user, "Пользователь")
+
+System_Boundary(bookingSystem, "Booking system"){
+    ContainerQueue(api, "API Gateway", "Azure API", "Взаимодействие с внешними сервисами, аутентификация клиентов и пользователей")
+
+       Container(webUI, "Web Application", "ASP.NET", "Веб-приложение для доступа к функциям системы бронирования")
+       Container(mobileApp, "Mobile App", "Flutter", "Мобильное приложение для доступа к функциям системы бронирования") 
+    
+    Boundary(msRegistrationClient, "Микросервис регистрации клиентов"){
+        Container(registrationClient, "Client registration service", "C#, .NET", "Сервис регистрации клиентов")
+        ContainerDb(dbRegistrationClient, "Client registration database", "PostgreSQL", "Хранение данных регистрации клиентов")
+    }
+    Boundary(msRegistrationUser, "Микросервис регистрации пользователей"){
+        Container(registrationUser, "User registration service", "C#, .NET", "Сервис регистрации пользователей")
+        ContainerDb(dbRegistrationUser, "User registration database", "PostgreSQL", "Хранение данных регистрации пользователей")
+    }
+    Boundary(msСlientLK, "Микросервис личного кабинета клиента"){
+        Container(clientLK, "Client account management service", "C#, .NET", "Сервис управления личным кабинетом клиента")
+        ContainerDb(dbClientLK, "Client account management database", "PostgreSQL", "Хранение данных личных кабинетов клиентов")
+    }
+    Boundary(msUserLK, "Микросервис личного кабинета пользователя"){
+        Container(userLK, "User account management service", "C#, .NET", "Сервис управления личным кабинетом пользователя")
+        ContainerDb(dbUserLK, "User account management database", "PostgreSQL", "Хранение данных личнвх кабинетов пользователей")
+    }
+    Boundary(msBookingTable, "Микросервис бронирования"){
+        Container(bookingTable, "Booking table module", "C#, .NET", "Сервис бронирования столика пользователем")
+        ContainerDb(dbBookingTable, "Booking table database", "PostgreSQL", "Хранение данных о бронированиях")
+    }
+    Boundary(service, "Микросервис логирования") {
+        Container(logUI, "Log UI", "Kibana", "Просмотр логов")
+        Container(log, "Logging system", "Elasticsearch", "Управление логированием и хранение логов")
+    }
+    
+}
+
+    System_Ext(rusprofile, "Rusprofile", "Сервис проверки контрагентов")
+    System_Ext(maps, "Google Maps", "Просмотр информации о ресторанах на карте")
+    System_Ext(analitics, "Google Analitycs", "Система веб-аналитики")
+    System_Ext(rkeeper, "R-Keeper", "Сервис автоматизации бронирвания столиков")
+    System_Ext(email, "E-mail server", "Хранение и передача информационных сообщений")
+
+
+BiRel_D(registrationUser, dbRegistrationUser, "Чтение и запись в БД", "ODBC")
+BiRel_D(registrationClient, dbRegistrationClient, "Чтение и запись в БД", "ODBC")
+BiRel_D(clientLK, dbClientLK, "Чтение и запись в БД", "ODBC")
+BiRel_D(userLK, dbUserLK, "Чтение и запись в БД", "ODBC")
+BiRel_D(bookingTable, dbBookingTable, "Чтение и запись в БД", "ODBC")
+Rel_D(logUI, log, "Запрашивает данные для визуализации", "REST/HTTP")
+
+Rel_D(user, mobileApp, " ")
+Rel_D(user, webUI, " ")
+Rel_D(manager, webUI, " ")
+Rel_D(client, webUI, " ")
+
+Rel_D(mobileApp, api, "Перенаправляет запросы", "HTTPS")
+Rel_D(webUI, api, "Перенаправляет запросы", "HTTPS")
+
+Rel_D(api, registrationUser, "Регистрация пользователя", "REST/HTTP")
+Rel_D(api, registrationClient, "Регистрация клиента", "REST/HTTP")
+Rel_D(api, clientLK, "Доступ к личному кабинету клиента", "REST/HTTP")
+Rel_D(api, userLK, "Доступ к личному кабинету пользователя", "REST/HTTP")
+Rel_D(api, bookingTable, "Бронирование", "REST/HTTP")
+Rel_L(api, log, "Передает логи", "REST/HTTP")
+
+Rel(bookingTable, rkeeper, "Статусы столиков", "REST/HTTP")
+Rel(api, email, "Запросы на отправку сообщения", "SMTP")
+Rel_L(registrationClient, rusprofile, "Информация о клиенте", "REST/HTTP")
+Rel(webUI, analitics, "Данные для формирования отчетов", "REST/HTTP")
+Rel(mobileApp, analitics, "Данные для формирования отчетов", "REST/HTTP")
+Rel(webUI, maps, "Отображение карты внутри приложения")
+Rel(mobileApp, maps, "Отображение карты внутри приложения")
+
+@enduml
