@@ -17,4 +17,4 @@ RUN pip install mkdocs-glightbox
 RUN pip install mkdocs-swagger-ui-tag
 RUN pip3 install mkdocs-build-plantuml-plugin
 RUN pip3 install mkdocs-enumerate-headings-plugin
-RUN pip3 install mkdocs-print-site-plugin
+# RUN pip3 install mkdocs-print-site-plugin

@@ -2,8 +2,8 @@
 site_name: RestoBook Docs
 
 # Repository
-repo_name: solopov-av-edu/example
-repo_url: https://github.com/solopov-av-edu/example
+repo_name: solopov-av-edu/RestoBook-Docs
+repo_url: https://github.com/solopov-av-edu/RestoBook-Docs
 
 theme:
   custom_dir: 'theme'
@@ -97,8 +97,8 @@ plugins:
       exclude:
         - index.md
         - glossary.md
-  - print-site:
-      path_to_pdf: "assets/test.pdf"
+  # - print-site:
+  #     path_to_pdf: "assets/test.pdf"
   - glightbox
 
 nav:
