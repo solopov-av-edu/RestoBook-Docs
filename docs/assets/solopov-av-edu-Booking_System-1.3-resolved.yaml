@@ -311,6 +311,36 @@ paths:
           $ref: '#/components/responses/422'
         '401':
           $ref: '#/components/responses/401'
+  /users/login:
+    post:
+      tags:
+        - Пользователь
+      summary: Аутентификация пользователя
+      security: []
+      operationId: authUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  description: Логин
+                password:
+                  type: string
+                  description: Пароль
+              required:
+                - login
+                - password
+      responses:
+        '200':
+          $ref: '#/components/responses/auth200'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
   /users/{userId}:
     get:
       tags:
@@ -351,36 +381,7 @@ paths:
           $ref: '#/components/responses/404'
         '401':
           $ref: '#/components/responses/401'
-  /users/login:
-    post:
-      tags:
-        - Пользователь
-      summary: Аутентификация пользователя
-      security: []
-      operationId: authUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                login:
-                  type: string
-                  description: Логин
-                password:
-                  type: string
-                  description: Пароль
-              required:
-                - login
-                - password
-      responses:
-        '200':
-          $ref: '#/components/responses/auth200'
-        '401':
-          $ref: '#/components/responses/401'
-        '404':
-          $ref: '#/components/responses/404'
+  
   /clients:
     post:
       tags:
