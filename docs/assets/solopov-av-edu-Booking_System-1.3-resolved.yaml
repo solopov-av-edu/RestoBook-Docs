@@ -14,7 +14,7 @@ paths:
     get:
       tags:
       - Ресторан
-      summary: Просмотр списка ресторанов
+      summary: Посмотреть список ресторанов
       security: []
       description: |
         Получение списка ресторанов с постраничной навигацией.
@@ -179,7 +179,7 @@ paths:
     get:
       tags:
       - Бронирование
-      summary: Просмотр бронирований
+      summary: Посмотреть бронирования
       description: |
         Просмотр бронирований с возможностью фильтрации по статусам брони:
           - активные бронирования - "Подтверждено", "Не подтверждено"
@@ -220,8 +220,8 @@ paths:
     post:
       tags:
       - Бронирование
-      summary: Создание нового бронирования
-      description: Забронировать свободный столик.
+      summary: Создать новое бронирование
+      description: Забронировать выбранные столики.
       operationId: createBooking
       requestBody:
         content:
@@ -242,7 +242,7 @@ paths:
     get:
       tags:
       - Бронирование
-      summary: Просмотр деталей бронирования
+      summary: Посмотреть детали бронирования
       description: Получить выбранное бронирование по ID со всеми атрибутами
       operationId: getBookingsById
       parameters:
@@ -262,7 +262,7 @@ paths:
     patch:
       tags:
       - Бронирование
-      summary: Отмена бронирования
+      summary: Отменить бронирование
       description: Перевод бронирования в статус "Отменено"
       operationId: bookingCancel
       parameters:
@@ -292,8 +292,9 @@ paths:
     post:
       tags:
       - Пользователь
-      summary: Создание нового пользователя
-      description: Создание нового пользователя.
+      summary: Создать нового пользователя
+      description: Регистрация нового пользователя.
+      security: []
       operationId: createUser
       requestBody:
         content:
@@ -384,8 +385,9 @@ paths:
     post:
       tags:
       - Клиент
-      summary: Создание нового пользователя
-      description: Создание нового пользователя.
+      summary: Создать нового клиента
+      description: Регистрация нового клиента.
+      security: []
       operationId: createClient
       requestBody:
         content:
