@@ -21,7 +21,7 @@ end box
 user++
 user ->> auth_f++: ввести логин
 user ->> auth_f: ввести пароль
-user -> auth_f: pressLoginButton
+user -> auth_f: нажать кнопку аутентификации
 user--
 
 auth_f -> auth_s++: отправить логин и пароль
