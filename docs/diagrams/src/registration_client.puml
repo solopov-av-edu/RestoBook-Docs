@@ -1,0 +1,31 @@
+@startuml
+actor User
+boundary ClientRegistrationForm
+control ClientRegistrationController
+entity ClientRegistrationService
+database ClientRegistrationDatabase
+
+User -> ClientRegistrationForm: выбирает тип бизнеса
+ClientRegistrationForm -> ClientRegistrationController: отправляет выбранный тип бизнеса
+ClientRegistrationController -> ClientRegistrationService: получает список тарифов
+ClientRegistrationService -> ClientRegistrationForm: возвращает список тарифов
+ClientRegistrationForm -> User: отображает список тарифов
+
+User -> ClientRegistrationForm: вводит контактные данные
+User -> ClientRegistrationForm: подтверждает введенные данные
+ClientRegistrationForm -> ClientRegistrationController: отправляет введенные данные
+ClientRegistrationController -> ClientRegistrationService: проверяет корректность введенных данных
+alt данные некорректны
+    ClientRegistrationService -> ClientRegistrationForm: возвращает сообщение об ошибке
+    User -> ClientRegistrationForm: исправляет данные
+    ClientRegistrationForm -> ClientRegistrationController: отправляет исправленные данные
+    ClientRegistrationController -> ClientRegistrationService: проверяет корректность исправленных данных
+else данные корректны
+    ClientRegistrationService -> ClientRegistrationForm: возвращает сообщение об успешной регистрации
+    ClientRegistrationForm -> ClientRegistrationController: отправляет данные на сервер
+    ClientRegistrationController -> ClientRegistrationService: записывает данные в базу данных
+end
+
+ClientRegistrationService -> ClientRegistrationForm: возвращает сообщение об успешной регистрации
+ClientRegistrationForm -> User: отображает сообщение об успешной регистрации
+@enduml
