@@ -1,0 +1,49 @@
+@startuml
+
+'hide footbox
+skinparam {
+    MaxMessageSize 200
+}
+skinparam sequence{
+    ParticipantPadding 30
+    MessageAlign center
+}
+autonumber "<b>[0]"
+
+actor "Пользователь" as user
+box "RestoBook" #transparent
+    participant "Страница регистрации" as page
+    participant "Микросервис регистрации" as service
+    database "База данных" as db
+    participant "СМС-сервис" as sms
+    'participant "Приложение" as app
+end box
+
+user++
+user -> page++: Открыть страницу регисрации
+user -> page: Ввести номер телефона
+user -> page: Ввести пароль
+user -> page: Зарегистрироваться
+page -> page++--: Проверить корректность заполненных полей
+page -> page++--: Отобразить поле для подтверждения СМС-кода
+page -> service++: Передать информацию о регистрации
+service -> db++: Найти номер телефона
+alt Новый пользователь
+db --> service--: Номер телефона не найден
+service -> service++--: Сгенерировать СМС-код
+service ->> sms++: Передать СМС-код
+sms -->> user--: СМС-код
+user -> page: Ввести СМС-код
+page -> service: Передать СМС-код
+service -> service++--: Проверить СМС-код
+service -> service++--: Сгенерировать хеш пароля
+service -> db++: Добавить пользователя
+db --> service--: Пользователь добавлен
+service --> page: Успешная регистрация
+page --> user: Успешная регистрация
+else Клиент уже зарегистрирован
+    db --> service--: Номер телефона не найден
+    service --> page--: Ошибка регистрации
+    page --> user: Ошибка регистрации
+end
+@enduml

@@ -1,4 +1,4 @@
-@startuml usecase
+@startuml
 left to right direction
 ' skinparam Linetype ortho
 

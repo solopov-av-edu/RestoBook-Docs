@@ -1,31 +1,56 @@
 @startuml
-actor User
-boundary ClientRegistrationForm
-control ClientRegistrationController
-entity ClientRegistrationService
-database ClientRegistrationDatabase
 
-User -> ClientRegistrationForm: выбирает тип бизнеса
-ClientRegistrationForm -> ClientRegistrationController: отправляет выбранный тип бизнеса
-ClientRegistrationController -> ClientRegistrationService: получает список тарифов
-ClientRegistrationService -> ClientRegistrationForm: возвращает список тарифов
-ClientRegistrationForm -> User: отображает список тарифов
+'hide footbox
+skinparam {
+    MaxMessageSize 200
+}
+skinparam sequence{
+    ParticipantPadding 30
+    MessageAlign center
+}
+autonumber "<b>[0]"
 
-User -> ClientRegistrationForm: вводит контактные данные
-User -> ClientRegistrationForm: подтверждает введенные данные
-ClientRegistrationForm -> ClientRegistrationController: отправляет введенные данные
-ClientRegistrationController -> ClientRegistrationService: проверяет корректность введенных данных
-alt данные некорректны
-    ClientRegistrationService -> ClientRegistrationForm: возвращает сообщение об ошибке
-    User -> ClientRegistrationForm: исправляет данные
-    ClientRegistrationForm -> ClientRegistrationController: отправляет исправленные данные
-    ClientRegistrationController -> ClientRegistrationService: проверяет корректность исправленных данных
-else данные корректны
-    ClientRegistrationService -> ClientRegistrationForm: возвращает сообщение об успешной регистрации
-    ClientRegistrationForm -> ClientRegistrationController: отправляет данные на сервер
-    ClientRegistrationController -> ClientRegistrationService: записывает данные в базу данных
+actor "Клиент" as user
+box "RestoBook" #transparent
+    participant "Страница регистрации" as page
+    participant "Микросервис регистрации" as service
+    database "База данных" as db
+    'participant "Приложение" as app
+end box
+
+user++
+user -> page++: Открыть страницу регисрации
+page ->> service++: Запросить список типов бизнеса
+service ->> db++: Запросить список типов бизнеса
+db -->> service: Список типов бизнеса
+service -->> page: Список типов бизнеса
+page ->> service: Запросить список тарифов
+service ->> db: Запросить список тарифов
+db -->> service--: Список тарифов
+service -->> page--: Список тарифов
+page --> user: Список типов бизнеса
+user -> page: Выбрать тип бизнеса
+page -> page++: Отфильтровать список тарифов по типу бизнеса
+page--
+page --> user: Список тарифов
+user -> page: Выбрать тариф
+user -> page: Ввести контактные данные
+user -> page: Зарегистрироваться
+page -> page++: Проверить корректность заполненных полей
+page--
+page -> service++: Передать информацию о регистрации
+service -> db++: Найти клиента
+
+alt Успешная регистрация
+    db --> service: Клиент не найден
+    service -> service++--: Сгенерировать хеш пароля
+    service -> db: Добавить клиента
+    db --> service: Клиент добавлен
+    service --> page: Успешная регистрация
+    page --> user: Успешная регистрация
+else Клиент уже зарегистрирован
+    db --> service--: Клиент найден
+    service --> page--: Ошибка регистрации
+    page --> user: Ошибка регистрации
 end
-
-ClientRegistrationService -> ClientRegistrationForm: возвращает сообщение об успешной регистрации
-ClientRegistrationForm -> User: отображает сообщение об успешной регистрации
 @enduml
