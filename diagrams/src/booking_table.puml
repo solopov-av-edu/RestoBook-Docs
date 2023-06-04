@@ -1,0 +1,53 @@
+@startuml
+
+'hide footbox
+skinparam {
+    MaxMessageSize 200
+}
+skinparam sequence{
+    ParticipantPadding 30
+    MessageAlign center
+}
+autonumber "<b>[0]"
+
+actor "Пользователь" as user
+box "RestoBook" #transparent
+    participant "Страница бронирования" as page
+    participant "Микросервис бронирования" as service
+    database "База данных" as db
+    'participant "Приложение" as app
+end box
+
+user++
+user -> page++: Открыть страницу бронирования
+page ->> service++: Запросить список столиков
+service -> db++: Запросить список столиков
+db --> service--: Список столиков
+service -->> page--: Список столиков
+page --> user: Список столиков
+user -> page: Ввести дату и время начала бронирования
+user -> page: Ввести дату и время окончания бронирования
+page -> page++: Отфильтровать список столиков
+page--
+page --> user: Отфильтрованный список
+user -> page: Забронировать столики
+page -> service++: Отправить запрос на бронирование
+service -> db++: Запросить статусы выбранных столиков
+db --> service--: Статусы столиков
+service -> service++: Проверить доступность столиков для бронирования
+service--
+
+alt Столики доступны к бронированию
+    service --> page: Сообщение о подтверждении бронирования
+    page --> user: Сообщение о подтверждении бронирования
+    user -> page: Подтвердить бронирование
+    page -> service: Подтвердить бронирование
+    service -> db++: Создать бронирование
+    db --> service--: Бронировани создано
+    service --> page: Бронировани создано
+    page --> user: Сообщение о создании бронирования
+else Аутентификация не пройдена
+    service --> page: Сообщение об ошибке бронирования
+    page --> user: Сообщение об ошибке бронирования
+end
+@enduml

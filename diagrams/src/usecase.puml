@@ -1,0 +1,78 @@
+@startuml
+left to right direction
+' skinparam Linetype ortho
+
+actor "Клиент" as ul
+actor "Менеджер" as manager
+actor "Пользователь" as fl
+
+rectangle "RestoBook" {
+    ' Клиент
+    usecase (UC-1: Регистрация клиента) as regUl
+    usecase (UC-2: Отмена регистрации клиента) as cancelRegUl
+    usecase (UC-3: Аутентификация клиента) as authUl
+    usecase (UC-4: Активация личного кабинета) as activateLK
+    usecase (UC-5: Просмотр информации о своей организации) as searchInfo
+    usecase (UC-6: Изменение информации о своей организации) as editCompanyInfo
+    usecase (UC-7: Добавление информации о ресторане) as insertRestInfo
+    usecase (UC-8: Изменение информации о ресторане) as editRestInfo
+    usecase (UC-9: Добавление информации о столиках) as insertTableInfo
+    usecase (UC-10: Добавление схемы расположения столиков) as insertTableMap
+    usecase (UC-11: Изменение информации о столиках) as editTableInfo
+
+    ' Пользователь
+    usecase (UC-12: Регистрация пользователя) as regFl
+    usecase (UC-13: Отмена регистрации пользователя) as cancelRegFl
+    usecase (UC-14: Аутентификация пользователя) as authFl
+    usecase (UC-15: Выбор ресторана) as searchRest
+    usecase (UC-16: Бронирование столиков из списка) as bookingTableList
+    usecase (UC-17: Бронирование столиков по количеству гостей) as bookingTableGuest
+    usecase (UC-18: Бронирование столиков на схеме расположения столиков) as bookingTableMap
+    usecase (UC-19: Просмотр бронирований) as bookingView
+    usecase (UC-20: Отмена бронирования) as bookingCancel
+
+    ' Менеджер
+    usecase (UC-21: Активация нового клиента) as newActivate
+    usecase (UC-22: Подбор индивидуальных условий) as chooseIndividualConditions
+    usecase checkCl as "UC-23: Верификация клиента
+    --
+    Extention points:
+    Подбор индивидуальных условий"
+
+    ul -- regUl
+    ul -- authUl
+    authUl <.. searchInfo : include
+    authUl <.. activateLK : include
+    authUl <.. insertRestInfo : include
+    searchInfo <.. editCompanyInfo : extend
+    insertRestInfo <.. insertTableInfo : extend
+    insertRestInfo <.. editRestInfo : extend
+    insertTableInfo <.. editTableInfo : extend
+    insertTableInfo <.. insertTableMap : extend
+
+    regUl <.. cancelRegUl : extend
+
+    manager -- regUl
+    manager -- checkCl
+    ' newActivate ..> (Найти клиента) : include
+    checkCl <.. newActivate : include
+    checkCl <.. chooseIndividualConditions : extend
+    note right of chooseIndividualConditions
+    Condition: {Тариф не соответствует обороту или выбраны индивидуальные условия}
+    extension point: Подбор индивидуальных условий"
+    end note
+
+    fl -- regFl
+    fl -- bookingView
+    fl -- searchRest
+    regFl <.. cancelRegFl : extend
+    searchRest <.. bookingTableList : extend
+    searchRest <.. bookingTableGuest : extend
+    searchRest <.. bookingTableMap : extend
+    bookingView <.. bookingCancel : extend
+    bookingView ..> authFl : include
+    bookingTableList ..> authFl : include
+    bookingTableGuest ..> authFl : include
+    bookingTableMap ..> authFl : include
+}
+@enduml

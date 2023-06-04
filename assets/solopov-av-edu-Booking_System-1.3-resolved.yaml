@@ -1,0 +1,865 @@
+---
+openapi: 3.0.0
+info:
+  title: RestoBook API
+  description: API спецификация для приложения бронирования столиков в ресторанах
+  version: "1.0.0"
+
+servers:
+- url: https://virtserver.swaggerhub.com/solopov-av-edu/RestoBookAPI/1.0.0
+  description: SwaggerHub API Auto Mocking
+
+paths:
+  /places:
+    get:
+      tags:
+      - Ресторан
+      summary: Посмотреть список ресторанов
+      security: []
+      description: |
+        Получение списка ресторанов с постраничной навигацией.
+      operationId: getPlaces
+      parameters:
+      - name: restName
+        in: query
+        description: Название ресторана
+        schema:
+          type: string
+      - name: kitchenType
+        in: query
+        description: Тип кухни
+        schema:
+          type: string
+      - name: restType
+        in: query
+        description: Тип заведения
+        schema:
+          type: string
+      - $ref: '#/components/parameters/offsetParam'
+      - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Place'
+        404:
+          $ref: '#/components/responses/404'
+    post:
+      tags:
+        - "Ресторан"
+      summary: Добавить новый ресторан
+      description: Добавление клиентом нового ресторана
+      operationId: addRest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Place'
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /places/{restId}:
+    get:
+      tags:
+      - Ресторан
+      summary: Получить ресторан по ID
+      security: []
+      description: Получить указанный ресторан со всеми атрибутами.
+      operationId: getPlaceById
+      parameters:
+      - $ref: '#/components/parameters/restId'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        404:
+          $ref: '#/components/responses/404'
+    put:
+      tags: 
+        - Ресторан
+      summary: Изменить информацию о ресторане
+      description: Изменить информацию указанного по ID ресторана
+      operationId: editRest
+      parameters:
+      - $ref: '#/components/parameters/restId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Place'
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /places/{restId}/tables:
+    get:
+      tags:
+        - Ресторан
+        - Столик
+      summary: Список столиков
+      security: []
+      description: Получить список столиков для ресторана по ID ресторана
+      operationId: getTablesByrestId
+      parameters:
+      - $ref: '#/components/parameters/restId'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Table'
+        404:
+          $ref: '#/components/responses/404'
+  /tables:
+    post:
+      tags:
+        - Столик
+      summary: Добавить новый столик
+      description: Добавление клиентом нового столика для выбранного ресторана
+      operationId: addTable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Table'
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /tables{tableId}: 
+    put:
+      tags:
+        - Столик
+      summary: Изменить информацию о столике
+      description: Добавление клиентом нового столика для выбранного ресторана
+      operationId: editTable
+      parameters:
+        - $ref: '#/components/parameters/tableId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Table'
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /bookings:
+    get:
+      tags:
+      - Бронирование
+      summary: Посмотреть бронирования
+      description: |
+        Просмотр бронирований с возможностью фильтрации по статусам брони:
+          - активные бронирования - "Подтверждено", "Не подтверждено"
+          - история бронирований - "Отменено", "Отклонено", "Завершено"
+      operationId: getBookings
+      parameters:
+      - name: status
+        in: query
+        description: Статус бронирования
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Подтверждено
+            - Не подтверждено
+            - Отменено
+            - Отклонено
+            - Завершено
+      - $ref: '#/components/parameters/offsetParam'
+      - $ref: '#/components/parameters/limitParam'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '404':
+          $ref: '#/components/responses/404'
+        '401':
+          $ref: '#/components/responses/401'
+    post:
+      tags:
+      - Бронирование
+      summary: Создать новое бронирование
+      description: Забронировать выбранные столики.
+      operationId: createBooking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+        required: true
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /bookings/{bookingId}:
+    get:
+      tags:
+      - Бронирование
+      summary: Посмотреть детали бронирования
+      description: Получить выбранное бронирование по ID со всеми атрибутами
+      operationId: getBookingsById
+      parameters:
+        - $ref: '#/components/parameters/bookingId'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          $ref: '#/components/responses/404'
+        '401':
+          $ref: '#/components/responses/401'
+  /bookings/{bookingId}/cancel:
+    patch:
+      tags:
+      - Бронирование
+      summary: Отменить бронирование
+      description: Перевод бронирования в статус "Отменено"
+      operationId: bookingCancel
+      parameters:
+        - $ref: '#/components/parameters/bookingId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - status
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: Отменено
+              description: Отмена бронирования
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /users:     
+    post:
+      tags:
+      - Пользователь
+      summary: Создать нового пользователя
+      description: Регистрация нового пользователя.
+      security: []
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '422':
+          $ref: '#/components/responses/422'
+        '401':
+          $ref: '#/components/responses/401'
+  /users/login:
+    post:
+      tags:
+        - Пользователь
+      summary: Аутентификация пользователя
+      security: []
+      operationId: authUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  description: Логин
+                password:
+                  type: string
+                  description: Пароль
+              required:
+                - login
+                - password
+      responses:
+        '200':
+          $ref: '#/components/responses/auth200'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+  /users/{userId}:
+    get:
+      tags:
+      - Пользователь
+      summary: Получить инофрмацию о пользователе по ID
+      description: Получить инофрмацию о пользователе по ID.
+      operationId: getUserById
+      parameters:
+      - $ref: '#/components/parameters/userId'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/404'
+        '401':
+          $ref: '#/components/responses/401'
+    put:
+      tags: 
+        - Пользователь
+      summary: Изменить информацию о пользователе по ID
+      description: Изменить инофрмацию о пользователе по ID.
+      operationId: editUser
+      parameters:
+      - $ref: '#/components/parameters/userId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '401':
+          $ref: '#/components/responses/401'
+  
+  /clients:
+    post:
+      tags:
+      - Клиент
+      summary: Создать нового клиента
+      description: Регистрация нового клиента.
+      security: []
+      operationId: createClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '422':
+          $ref: '#/components/responses/422'
+        '404':
+          $ref: '#/components/responses/404'
+  /clients/login:
+    post:
+      tags:
+        - Клиент
+      summary: Аутентификация клиента
+      security: []
+      operationId: authClient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  description: Логин
+                password:
+                  type: string
+                  description: Пароль
+              required:
+                - login
+                - password
+      responses:
+        '200':
+          $ref: '#/components/responses/auth200'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+  /clients/{clientId}:
+    get:
+      tags:
+      - Клиент
+      summary: Получить инофрмацию о клиенте по ID
+      description: Получить инофрмацию о клиенте по ID.
+      operationId: getClientById
+      parameters:
+      - $ref: '#/components/parameters/clientId'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '404':
+          $ref: '#/components/responses/404'
+        '401':
+          $ref: '#/components/responses/401'
+    put:
+      tags: 
+        - Клиент
+      summary: Изменить информацию о пользователе по ID
+      description: Изменить инофрмацию о пользователе по ID.
+      operationId: editClient
+      parameters:
+      - $ref: '#/components/parameters/clientId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+      responses:
+        "200":
+          $ref: '#/components/responses/200'
+        '404':
+          $ref: '#/components/responses/404'
+        '401':
+          $ref: '#/components/responses/401'
+components:
+  schemas:
+    Place:
+      required:
+      - clientId
+      - name
+      - address
+      - description
+      - phoneNumber
+      - restId
+      - raiting
+      type: object
+      properties:
+        restId:
+          allOf:
+            - $ref: '#/components/parameters/restId'
+          type: integer
+        clientId:
+          allOf:
+            - $ref: '#/components/parameters/clientId'
+          type: integer
+        name:
+          maxLength: 150
+          minLength: 2
+          type: string
+          description: Название ресторана
+          nullable: false
+        address:
+          maxLength: 500
+          minLength: 2
+          type: string
+          description: Адрес ресторана
+          nullable: false
+          example: "Москва, Малая Дмитровка, 20"
+        image:
+          maxLength: 500
+          minLength: 10
+          type: string
+          description: Фото ресторана (URL)
+          nullable: false
+          example: 'https://www.restoclub.ru/msk/place/biologie#gallery/place/126029'
+        description:
+          maxLength: 2000
+          minLength: 50
+          type: string
+          description: Описание ресторана
+          nullable: false
+          example: Ресторан расположен в центре города и предлагает широкий спектр блюд, включая пиццу, суши, закуски и десерты.
+        phoneNumber:
+          maxLength: 2000
+          minLength: 50
+          type: string
+          description: Телефон ресторана
+          example: +7 999 888 77 66
+        raiting:
+          type: string
+          description: Рейтинг ресторана
+          nullable: false
+          enum:
+          - ужасно
+          - плохо
+          - нормально
+          - хорошо
+          - супер
+        tables:
+          maxItems: 500
+          minItems: 1
+          type: array
+          description: Список столиков
+          nullable: false
+          items:
+            $ref: '#/components/schemas/Table'
+    Table:
+      required:
+      - id
+      - isAvailable
+      - name
+      - tableSize
+      type: object
+      properties:
+        tableId:
+          allOf:
+            - $ref: '#/components/parameters/tableId'
+          type: integer
+        restId:
+          allOf:
+            - $ref: '#/components/parameters/restId'
+          type: integer
+        name:
+          description: Название или номер столика в ресторане
+          nullable: false
+          oneOf:
+          - type: string
+          - type: integer
+        isAvailable:
+          type: boolean
+          description: Доступность столика для бронирования
+          nullable: false  
+        tableSize:
+          description: Количество мест за столиком
+          nullable: false
+          minimum: 1
+          type: integer 
+    Booking:
+      description: Информация о бронировании
+      type: object
+      required:
+      - dateTime
+      - duration
+      - tableId
+      - userId
+      - bookingId
+      - status
+      properties:
+        tableId:
+          allOf:
+            - $ref: '#/components/parameters/tableId'
+          type: integer
+        userId:
+          allOf:
+            - $ref: '#/components/parameters/userId'
+          type: integer
+        bookingId:
+          allOf:
+            - $ref: '#/components/parameters/bookingId'
+          type: integer
+        dateTime:
+          type: string
+          description: Дата и время бронирования
+          format: date-time
+          nullable: false
+          example: '2021-08-30T23:01:14.274085491+15:55'
+          pattern: >-
+              ^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:(?:[0-5][0-9]|60)(?:\.[0-9]{1,15})?(?:Z|[+\-](?:[01][0-9]|2[0-3]):[0-5][0-9])$
+          minLength: 20
+          maxLength: 38
+          x-42c-format: o:date-time
+        duration:
+          maximum: 1440
+          minimum: 20
+          type: integer
+          description: "Продолжительность бронирования, мин"
+        status:
+          type: string
+          description: Статус бронирования
+          nullable: false
+          example: Не подтверждено
+    User:
+      description: Информация о пользователе
+      required:
+      - userId
+      - name
+      - phoneNumber
+      type: object
+      properties:
+        userId:
+          allOf:
+            - $ref: '#/components/parameters/userId'
+          type: integer
+        name:
+          maxLength: 150
+          minLength: 2
+          type: string
+          description: Имя пользователя
+          nullable: false
+        phoneNumber:
+          maxLength: 2000
+          minLength: 50
+          type: string
+          description: Телефон ресторана
+          example: +7 999 888 77 66
+        email:
+          maxLength: 500
+          minLength: 2
+          type: string
+          description: email пользователя
+          nullable: false
+          example: example@email.com
+    Client:
+      description: Информация о клиенте
+      required:
+      - clientId
+      - name
+      - email
+      - tariff
+      type: object
+      properties:
+        userId:
+          allOf:
+            - $ref: '#/components/parameters/clientId'
+          type: integer
+        name:
+          maxLength: 150
+          minLength: 2
+          type: string
+          description: Имя клиента
+          nullable: false
+        email:
+          maxLength: 500
+          minLength: 2
+          type: string
+          description: email пользователя
+          nullable: false
+          example: example@email.com
+        tariff:
+          type: object
+          description: Выбранный клентом тариф
+          required:
+            - name
+            - isIndividual
+            - comission
+            - discount
+          properties:
+            name:
+              maxLength: 150
+              minLength: 2
+              type: string
+              description: Название тарифа
+              nullable: false
+            isIndividual:
+              type: boolean
+              description: Индивидуальный тариф
+            comission:
+              maximum: 100
+              minimum: 0
+              type: integer
+              description: Комиссия тарифа
+            discount:
+              maximum: 100
+              minimum: 0
+              type: integer
+              description: Скидка
+        phoneNumber:
+          maxLength: 2000
+          minLength: 50
+          type: string
+          description: Телефон ресторана
+          example: +7 999 888 77 66
+  responses:
+    '200':
+      description: OK
+    auth200:
+      description: Аутентификация выполнена успешно
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                example: 9038-20380-9340-98
+            required:
+              - token
+    '404':
+      description: Что-то пошло не так...
+      content:
+        application/json:
+          schema:
+            required:
+            - code
+            - errorId
+            - messageEn
+            - messageRu
+            type: object
+            properties:
+              errorId:
+                type: integer
+              code:
+                maximum: 599
+                minimum: 400
+                type: integer
+              messageRu:
+                maxLength: 500
+                minLength: 1
+                pattern: "([А-Яа-я0-9-]+)"
+                type: string
+                nullable: false
+              messageEn:
+                maxLength: 500
+                minLength: 1
+                pattern: "([A-Za-z0-9-]+)"
+                type: string
+                nullable: false
+            description: Текст сообщения об ошибке
+    '422':
+      description: Ошибка бизнес-логики
+      content:
+        application/json:
+          schema:
+            required:
+            - code
+            - message
+            type: object
+            properties:
+              code:
+                type: integer
+                description: Код ошибки
+              message:
+                type: string
+                description: Подробности ошибки
+                example: Невозможно забронировать столики. Столик №1 уже забронирован.
+    '401':
+      description: Неправильный логин или пароль
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  parameters:
+    restId:
+      name: restId
+      in: path
+      description: Уникальный ID ресторана
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+    tableId:
+      name: tableId
+      in: path
+      description: Уникальный ID столика
+      required: true
+      style: simple
+      explode: false
+      # example: 5
+      schema:
+        type: integer
+    bookingId:
+      name: bookingId
+      in: path
+      description: Уникальный ID бронирования
+      required: true
+      style: simple
+      explode: false
+      # example: 10
+      schema:
+        type: integer
+    clientId:
+      name: clientId
+      in: path
+      description: Уникальный ID клиента
+      required: true
+      style: simple
+      explode: false
+      # example: 15
+      schema:
+        type: integer
+    userId:
+      name: userId
+      in: path
+      description: Уникальный ID пользователя
+      required: true
+      style: simple
+      explode: false
+      # example: 17
+      schema:
+        type: integer
+    offsetParam:
+      name: offset
+      in: query
+      description: Номер первого элемента на странице
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 1
+        type: integer
+        default: 1
+    limitParam:
+      name: limit
+      in: query
+      description: Количество элементов на странице
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 100
+        minimum: 5
+        type: integer
+        default: 20
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: apiKey
+      in: query
+security:
+  - apiKey: []

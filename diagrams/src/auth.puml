@@ -1,0 +1,56 @@
+@startuml
+
+'hide footbox
+skinparam {
+    MaxMessageSize 200
+}
+skinparam sequence{
+    ParticipantPadding 30
+    MessageAlign center
+}
+autonumber "<b>[0]"
+
+actor "Пользователь/клиент" as user
+box "RestoBook" #transparent
+    participant "Страница аутентификации" as auth_f
+    participant "Сервис аутентификации" as auth_s
+    database "База данных" as db
+    'participant "Приложение" as app
+end box
+
+user++
+user ->> auth_f++: ввести логин
+user ->> auth_f: ввести пароль
+user -> auth_f: нажать кнопку аутентификации
+user--
+
+auth_f -> auth_s++: отправить логин и пароль
+auth_f--
+auth_s -> auth_s++: сгенерировать хеш пароля
+auth_s--
+auth_s -> db++: проверить наличие пользователя
+auth_s--
+alt Успешная аутентификация
+    
+    db --> auth_s: пользователь найден
+    auth_s++
+    db--
+    auth_s -> auth_s++: сгенерировать токен
+    auth_s--
+    auth_s --> auth_f: отправить токен
+    auth_s--
+    auth_f++
+    auth_f --> auth_f++: перенаправить на целевую страницу
+    auth_f--
+    auth_f--
+else Аутентификация не пройдена
+    db++
+    db --> auth_s++: пользователь не найден
+    db--
+    auth_s --> auth_f++: сообщение об ошибке
+    auth_s--
+    auth_f --> user: вывести сообщение об ошибке
+    
+    auth_f--
+end
+@enduml
