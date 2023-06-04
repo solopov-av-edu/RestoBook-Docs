@@ -121,5 +121,4 @@ nav:
     - tasks/registration_user.md
     - tasks/auth_client.md
     - tasks/auth_user.md
-    - tasks/add_restaurant.md
     - tasks/booking_table.md
